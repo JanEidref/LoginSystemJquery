@@ -108,10 +108,12 @@
                 throw new Exception("<strong>Error:</strong> Please Select A Role For The User!");
             }
 
-            $query             = "SELECT username FROM users WHERE username='$userName'";
-            $result            = mysqli_query($this->connection, $query);
+            $query             = $this->connection->prepare("SELECT username FROM users WHERE username=?");
+            $query             ->bind_param("s", $userName);
+            $query             ->execute();
+            $row               =$query->get_result();
 
-            if(mysqli_num_rows($result) > 0){
+            if($row->num_rows > 0){
                 throw new Exception("<strong>Error:</strong> Username Already Taken!");
             }
 
@@ -179,10 +181,12 @@
                 throw new Exception("<strong>Error:</strong> Please Select A Role For The User!");
             }
             
-            $query  = "SELECT username FROM users WHERE username='$userName' and uid!='$uid'";
-            $result = mysqli_query($this->connection, $query);
+            $query  = $this->connection->prepare("SELECT username FROM users WHERE username=? and uid!=?");
+            $query  ->bind_param("si", $userName, $uid);
+            $query  ->execute();
+            $row    = $query->get_result();
 
-            if(mysqli_num_rows($result) > 0){
+            if($row->num_rows > 0){
                 throw new Exception("<strong>Error:</strong> Username Already Taken!");
             }
 
