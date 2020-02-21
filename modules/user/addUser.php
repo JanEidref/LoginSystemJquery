@@ -1,5 +1,6 @@
 <?php
 
+    require_once '../database/database.php';
     include 'class.user.php';
 
     $userName  = $_POST['userName'];
@@ -9,8 +10,14 @@
     $role      = $_POST['role']; 
 
     try{
-        $user = new User(1);
-        $user->addUSer($userName, $password, $firstName, $lastName, $role);        
+        $user = new User();
+        $user->checkAddFields($userName, $password, $firstName, $lastName, $role);
+        $user->checkUserName($userName);        
+        $user->addUser($userName, $password);
+        $user->addUserProfile($firstName, $lastName);
+        $user->addUSerRole($role);
+        $response = array('Result' => "<strong>Success:</strong> Successfully Added User!", 'Status' => "alert alert-success");
+        echo json_encode($response);        
     }catch (Exception $e){
         $response = array('Result' => $e->getMessage(), 'Status' => "alert alert-danger");
         echo json_encode($response);

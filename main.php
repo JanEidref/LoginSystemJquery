@@ -1,17 +1,20 @@
 <?php
     session_start();
-    include 'modules/user/class.user.php';
+    require_once 'modules/database/database.php';
+    include      'modules/user/class.user.php';
+    include      'modules/rbac/class.rbac.php';
 
-    $uid = $_SESSION['uid'];
+    $id       = $_SESSION['uid'];
+    $name     = $_SESSION['name'];
+    $role     = $_SESSION['role'];
+    $roleName = $_SESSION['roleName'];
+    
 
-    if(!isset($uid)){
+    if(!$id){
+        $_SESSION['Error'] = "Access Denied!";
         header('Location: index.php');
-        exit();
-    }else{
-        $user = new User($uid);
-        $role = $user->getUserRole();
-        $name = $user->getUsersName();
     }
+
 ?>
 
 <!DOCTYPE html>
@@ -31,13 +34,13 @@
     <div class="container">
         <h1 class="text-info font-weight-bolder text-center">
             <?php 
-                echo 'Hello, '.$role.' '.$name.'! ';
+                echo 'Hello, '.$roleName.' '.$name.'! ';
                 echo '<a class="text-danger" href="modules/login/logout.php" data-toggle="tooltip" data-placement="right" title="Logout!">x</a>';
             ?>
         </h1>
         <nav class="mb-4">            
                 <?php
-                    if($role == "Admin"){
+                    if($role == 1){
                         echo '<div class="nav nav-tabs nav-fill" id="nav-tab" role="tablist">';
                         echo '<a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Home</a>';
                         echo '<a class="nav-item nav-link" id="nav-add-tab" data-toggle="tab" href="#nav-add" role="tab" aria-controls="nav-add" aria-selected="false">Add</a>';
@@ -54,38 +57,7 @@
             <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
                 <h5 class="text-info text-center">All Users</h5>
                <?php
-                    echo '<table id="dataTable" class="table table-hover table-bordered mt-2">';
-                    echo '  <thead>';
-                    echo '      <tr>';
-                    echo '          <th class="text-center"></th>';
-                    echo '          <th class="text-center">Username</th>';
-                    echo '          <th class="text-center">Name</th>';
-                    echo '          <th class="text-center">Role</th>';
-                    echo '      </tr>';
-                    echo '  </thead>';
-                    echo '  <tbody>';
-
-                    $number = 1;
-
-                    foreach($user->getAllFromUser() as $data){
-
-                        if($uid <> $data['uid']){
-                            $id = new User($data['uid']);
-
-                            echo '  <tr>';
-                            echo '      <td class="text-center">'.$number.'</td>';
-                            echo '      <td class="text-center">'.$data['username'].'</td>';
-                            echo '      <td class="text-center">'.$id->getUsersName().'</td>';
-                            echo '      <td class="text-center">'.$id->getUserRole().'</>';
-                            echo '  </tr>';
-
-                            $number++;
-                        }
-
-                    }
-
-                    echo '  </tbody>';
-                    echo '</table>';
+                    include 'modules/others/dataTable.php';
                ?>
             </div>
             <div class="tab-pane fade" id="nav-add" role="tabpanel" aria-labelledby="nav-edit-tab">
@@ -119,8 +91,9 @@
                         <div id="selectAdd" class="col-sm-6">
                             <select class="browser-default custom-select" name="role">
                                 <option value="0" selected>--User Roles--</option>
-                                <option value="1">Admin</option>
-                                <option value="2">Guest</option>
+                                <?php
+                                    include 'modules/others/roleSelect.php';
+                                ?>
                             </select> 
                         </div>
                         <div class="col-sm-6">
@@ -140,42 +113,7 @@
                         </div>
                     </div>
                     <?php
-                        echo '<table id="tableEdit" class="table table-hover table-bordered mt-2">';
-                        echo '  <thead>';
-                        echo '      <tr>';
-                        echo '          <th class="text-center"></th>';
-                        echo '          <th class="text-center">Username</th>';
-                        echo '          <th class="text-center">Name</th>';
-                        echo '          <th class="text-center">Role</th>';
-                        echo '          <th class="text-center">Action</th>';
-                        echo '      </tr>';
-                        echo '  </thead>';
-                        echo '  <tbody>';
-
-                        $number = 1;
-
-                        foreach($user->getAllFromUser() as $data){
-
-                            if($uid <> $data['uid']){
-
-                                $id = new User($data['uid']);
-
-                                echo '  <tr>';
-                                echo '      <td class="text-center">'.$number.'</td>';
-                                echo '      <td class="text-center">'.$data['username'].'</td>';
-                                echo '      <td class="text-center">'.$id->getUsersName().'</td>';
-                                echo '      <td class="text-center">'.$id->getUserRole().'</td>';
-                                echo '      <td class="text-center"><button class="edit btn btn-primary" value="'.$data['uid'].'" name="edit">Edit</button></td>';
-                                echo '  </tr>';
-        
-                                $number++;
-
-                            }
-
-                        }
-
-                        echo '  </tbody>';
-                        echo '</table>';
+                        include 'modules/others/editTable.php';
                     ?>
                 </div>
 
@@ -232,42 +170,42 @@
                     </div>
                 </div>
                 <?php
-                    echo '<table id="tableDelete" class="table table-hover table-bordered mt-2">';
-                    echo '  <thead>';
-                    echo '      <tr>';
-                    echo '          <th class="text-center"></th>';
-                    echo '          <th class="text-center">Username</th>';
-                    echo '          <th class="text-center">Name</th>';
-                    echo '          <th class="text-center">Role</th>';
-                    echo '          <th class="text-center">Action</th>';
-                    echo '      </tr>';
-                    echo '  </thead>';
-                    echo '  <tbody>';
+                    // echo '<table id="tableDelete" class="table table-hover table-bordered mt-2">';
+                    // echo '  <thead>';
+                    // echo '      <tr>';
+                    // echo '          <th class="text-center"></th>';
+                    // echo '          <th class="text-center">Username</th>';
+                    // echo '          <th class="text-center">Name</th>';
+                    // echo '          <th class="text-center">Role</th>';
+                    // echo '          <th class="text-center">Action</th>';
+                    // echo '      </tr>';
+                    // echo '  </thead>';
+                    // echo '  <tbody>';
 
-                    $number = 1;
+                    // $number = 1;
 
-                    foreach($user->getAllFromUser() as $data){
+                    // foreach($user->getAllFromUser() as $data){
 
-                        if($uid <> $data['uid']){
+                    //     if($uid <> $data['uid']){
 
-                            $id = new User($data['uid']);
+                    //         $id = new User();
 
-                            echo '  <tr>';
-                            echo '      <td class="text-center">'.$number.'</td>';
-                            echo '      <td class="text-center">'.$data['username'].'</td>';
-                            echo '      <td class="text-center">'.$id->getUsersName().'</td>';
-                            echo '      <td class="text-center">'.$id->getUserRole().'</td>';
-                            echo '      <td class="text-center"><button class="delete btn btn-danger" value="'.$data['uid'].'" name="delete">Delete</button></td>';
-                            echo '  </tr>';
+                    //         echo '  <tr>';
+                    //         echo '      <td class="text-center">'.$number.'</td>';
+                    //         echo '      <td class="text-center">'.$data['username'].'</td>';
+                    //         echo '      <td class="text-center">'.$id->getUsersName($data['uid']).'</td>';
+                    //         echo '      <td class="text-center">'.$id->getUserRole($data['uid']).'</td>';
+                    //         echo '      <td class="text-center"><button class="delete btn btn-danger" value="'.$data['uid'].'" name="delete">Delete</button></td>';
+                    //         echo '  </tr>';
     
-                            $number++;
+                    //         $number++;
 
-                        }
+                    //     }
 
-                    }
+                    // }
 
-                    echo '  </tbody>';
-                    echo '</table>';
+                    // echo '  </tbody>';
+                    // echo '</table>';
                ?>
             </div>
         </div> 
@@ -340,14 +278,14 @@
                 success  : function(response){
                     var jsonData  = JSON.parse(response);
                     var space     = " ";
-                    var firstName = jsonData.FirstName.concat(space);
-                    var fullName  = firstName.concat(jsonData.LastName)
+                    var firstName = jsonData.first_name.concat(space);
+                    var fullName  = firstName.concat(jsonData.last_name)
                     $('#editName')         .html(fullName);
-                    $('#editFirstName')    .attr("placeholder", jsonData.FirstName);
-                    $('#editLastName')     .attr("placeholder", jsonData.LastName);
-                    $('#editUserName')     .attr("placeholder", jsonData.UserName);
-                    $('#uid')              .attr("value", jsonData.Uid);
-                    $('#selectEdit select').val (jsonData.Role);
+                    $('#editFirstName')    .attr("placeholder", jsonData.first_name);
+                    $('#editLastName')     .attr("placeholder", jsonData.last_name);
+                    $('#editUserName')     .attr("placeholder", jsonData.username);
+                    $('#uid')              .attr("value", jsonData.uid);
+                    $('#selectEdit select').val (jsonData.role);
                     $('#addStatus')        .html("");
                     $('#addStatus')        .attr("class", "");
                     $('#deleteStatus')     .html("");
