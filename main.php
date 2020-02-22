@@ -57,7 +57,7 @@
             <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
                 <h5 class="text-info text-center">All Users</h5>
                <?php
-                    include 'modules/others/dataTable.php';
+                    include 'modules/resources/dataTable.php';
                ?>
             </div>
             <div class="tab-pane fade" id="nav-add" role="tabpanel" aria-labelledby="nav-edit-tab">
@@ -92,7 +92,7 @@
                             <select class="browser-default custom-select" name="role">
                                 <option value="0" selected>--User Roles--</option>
                                 <?php
-                                    include 'modules/others/roleSelect.php';
+                                    include 'modules/resources/roleSelect.php';
                                 ?>
                             </select> 
                         </div>
@@ -113,7 +113,7 @@
                         </div>
                     </div>
                     <?php
-                        include 'modules/others/editTable.php';
+                        include 'modules/resources/editTable.php';
                     ?>
                 </div>
 
@@ -149,7 +149,7 @@
                             <select class="browser-default custom-select" name="editRole">
                                 <option value="0">--User Roles--</option>
                                 <?php
-                                    include 'modules/others/editRoleSelect.php';
+                                    include 'modules/resources/editRoleSelect.php';
                                 ?>
                             </select> 
                         </div>
@@ -171,7 +171,7 @@
                     </div>
                 </div>
                 <?php
-                    include 'modules/others/deleteTable.php';
+                    include 'modules/resources/deleteTable.php';
                ?>
             </div>
         </div> 
