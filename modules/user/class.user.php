@@ -82,18 +82,16 @@
        //get max uid
        function getMaxUid(){
 
-            $data = $this->connection->getValue("users", "max(uid)");
-            return $data;
+           return $this->connection->getValue("users", "max(uid)");
 
        }
 
        //get max uid in user profile
        function getMaxUidProfile(){
 
-            $data = $this->connection->getValue("user_profile", "max(uid)");
-            return $data;
+            return $this->connection->getValue("user_profile", "max(uid)");
 
-        }
+       }
 
        //add user login info
        function addUser($userName, $password){
