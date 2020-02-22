@@ -147,9 +147,10 @@
                     <div class="row">
                         <div id="selectEdit" class="col-sm-6">
                             <select class="browser-default custom-select" name="editRole">
-                                <option value="0" selected>--User Roles--</option>
-                                <option value="1">Admin</option>
-                                <option value="2">Guest</option>
+                                <option value="0">--User Roles--</option>
+                                <?php
+                                    include 'modules/others/editRoleSelect.php';
+                                ?>
                             </select> 
                         </div>
                         <div class="col-sm-6">
@@ -170,42 +171,7 @@
                     </div>
                 </div>
                 <?php
-                    // echo '<table id="tableDelete" class="table table-hover table-bordered mt-2">';
-                    // echo '  <thead>';
-                    // echo '      <tr>';
-                    // echo '          <th class="text-center"></th>';
-                    // echo '          <th class="text-center">Username</th>';
-                    // echo '          <th class="text-center">Name</th>';
-                    // echo '          <th class="text-center">Role</th>';
-                    // echo '          <th class="text-center">Action</th>';
-                    // echo '      </tr>';
-                    // echo '  </thead>';
-                    // echo '  <tbody>';
-
-                    // $number = 1;
-
-                    // foreach($user->getAllFromUser() as $data){
-
-                    //     if($uid <> $data['uid']){
-
-                    //         $id = new User();
-
-                    //         echo '  <tr>';
-                    //         echo '      <td class="text-center">'.$number.'</td>';
-                    //         echo '      <td class="text-center">'.$data['username'].'</td>';
-                    //         echo '      <td class="text-center">'.$id->getUsersName($data['uid']).'</td>';
-                    //         echo '      <td class="text-center">'.$id->getUserRole($data['uid']).'</td>';
-                    //         echo '      <td class="text-center"><button class="delete btn btn-danger" value="'.$data['uid'].'" name="delete">Delete</button></td>';
-                    //         echo '  </tr>';
-    
-                    //         $number++;
-
-                    //     }
-
-                    // }
-
-                    // echo '  </tbody>';
-                    // echo '</table>';
+                    include 'modules/others/deleteTable.php';
                ?>
             </div>
         </div> 

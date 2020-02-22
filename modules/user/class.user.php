@@ -36,15 +36,24 @@
        }
 
        //validate add fields
-       function checkAddFields($userName, $password, $firstName, $lastName, $role){
+       function checkAddFields($userName, $password, $firstName, $lastName){
 
             if(!$userName == TRUE || !$password == TRUE || !$firstName == TRUE || !$lastName == TRUE){
                 throw new Exception("<strong>Error:</strong> No Blank Fields Please!");
-            }else if($role == 0){
-                throw new Exception("<strong>Error:</strong> Please Select A Role For The User!");
             }
 
        }
+
+       //validate edit fields
+       function checkEditFields($userName, $firstName, $lastName){
+
+            if(!$userName == TRUE || !$firstName == TRUE || !$lastName == TRUE){
+                throw new Exception("<strong>Error:</strong> No Blank Fields Please!");
+            }
+
+       }
+
+
 
        //check if username is already taken
        function checkUserName($userName){
@@ -58,6 +67,18 @@
 
        }
 
+       //check if username is taken on edit
+       function checkUserEditName($uid, $userName){
+
+          $this->connection->where("username", $userName);
+          $this->connection->where("uid != ".$uid);
+          $row = $this->connection->getOne("users");
+
+          if(!is_null($row)){
+              throw new Exception("<strong>Error:</strong> Username Already Taken!");
+          }
+
+     }
        //get max uid
        function getMaxUid(){
 
@@ -70,14 +91,6 @@
        function getMaxUidProfile(){
 
             $data = $this->connection->getValue("user_profile", "max(uid)");
-            return $data;
-
-        }
-
-        //get max uid in rbac
-        function getMaxUidRbac(){
-
-            $data = $this->connection->getValue("rbac", "max(uid)");
             return $data;
 
         }
@@ -103,89 +116,51 @@
 
        }
 
-       //add user role
-       function addUserRole($role){
-
-            $uid = $this->getMaxUidRbac() + 1;
-
-            $data = array("uid" => $uid, "role" => $role);
-            $this->connection->insert('rbac', $data);
-
-       }
-
-       //Delete user by id
+       //Delete user login data by id
        function deleteUser($uid){
 
-            $name      = $this->getUsersName($uid); 
-            $user      = "DELETE FROM users WHERE uid='$uid'";
-            $profile   = "DELETE FROM user_profile WHERE uid='$uid'";
-            $rbac      = "DELETE FROM rbac WHERE uid='$uid'";
-
-            mysqli_query($this->connection, $user);
-            mysqli_query($this->connection, $profile);
-            mysqli_query($this->connection, $rbac);
-
-            echo "<strong>Success:</strong> Successfully Deleted User ".$name."!";
+            $this->connection->where("uid", $uid); 
+            $this->connection->delete("users");
 
        }
 
-    //    //Edit user data
-    //    function editUser($uid, $firstName, $lastName, $userName, $password, $role){
+       //Delete user profile by id
+       function deleteUserProfile($uid){
 
-    //         if(!$userName == TRUE || !$firstName == TRUE || !$lastName == TRUE){
-    //             throw new Exception("<strong>Error:</strong> No Blank Fields Please!");
-    //         }else if($role == 0){
-    //             throw new Exception("<strong>Error:</strong> Please Select A Role For The User!");
-    //         }
-            
-    //         $query  = $this->connection->prepare("SELECT username FROM users WHERE username=? and uid!=?");
-    //         $query  ->bind_param("si", $userName, $uid);
-    //         $query  ->execute();
-    //         $row    = $query->get_result();
+          $this->connection->where("uid", $uid); 
+          $this->connection->delete("user_profile");
 
-    //         if($row->num_rows > 0){
-    //             throw new Exception("<strong>Error:</strong> Username Already Taken!");
-    //         }
+       }
 
-    //         if(!$password == TRUE){
+       //Edit user login data
+       function editUser($uid, $userName, $password){
 
-    //             $editUser    = $this->connection->prepare('UPDATE users SET username=? WHERE uid=?');
-    //             $editUser->bind_param("si", $userName, $uid);
-    //             $editUser->execute();
-    
-    //             $editProfile = $this->connection->prepare('UPDATE user_profile SET first_name=?, last_name=? WHERE uid=?');
-    //             $editProfile->bind_param("ssi", $firstName, $lastName, $uid);
-    //             $editProfile->execute();
-    
-    //             $editRbac    = $this->connection->prepare('UPDATE rbac SET role=? WHERE uid=?');
-    //             $editRbac->bind_param("ii", $role, $uid);
-    //             $editRbac->execute();
-     
-    //             $response    = array('Result' => "<strong>Success:</strong> Successfully Edited User ".$this->getUsersName()."!", 'Status' => "alert alert-success");
-    //             echo json_encode($response);
+            if(!$password == TRUE){
 
-    //         }else{
+               $data = array('username' => $userName);
+               $this->connection->where("uid", $uid);
+               $this->connection->update("users", $data);               
 
-    //             $encrypt     = password_hash($password, PASSWORD_DEFAULT);
+            }else{
 
-    //             $editUser    = $this->connection->prepare('UPDATE users SET username=?, password=? WHERE uid=?');
-    //             $editUser->bind_param("ssi", $userName, $encrypt, $uid);
-    //             $editUser->execute();
-    
-    //             $editProfile = $this->connection->prepare('UPDATE user_profile SET first_name=?, last_name=? WHERE uid=?');
-    //             $editProfile->bind_param("ssi", $firstName, $lastName, $uid);
-    //             $editProfile->execute();
-    
-    //             $editRbac    = $this->connection->prepare('UPDATE rbac SET role=? WHERE uid=?');
-    //             $editRbac->bind_param("ii", $role, $uid);
-    //             $editRbac->execute();
-     
-    //             $response    = array('Result' => "<strong>Success:</strong> Successfully Edited User ".$this->getUsersName()."!", 'Status' => "alert alert-success");
-    //             echo json_encode($response);
+                $encrypt = password_hash($password, PASSWORD_DEFAULT);
+
+                $data = array('username' => $userName, 'password' => $encrypt);
+                $this->connection->where("uid", $uid);
+                $this->connection->update("users", $data);
                 
-    //         }
+            }
 
-    //    }
+       }
+
+       //Edit user login data
+       function editUserProfile($uid, $firstName, $lastName){
+
+          $data = array('first_name' => $firstName, 'last_name' => $lastName);
+          $this->connection->where("uid", $uid);
+          $this->connection->update("user_profile", $data); 
+
+       }
 
     }
 

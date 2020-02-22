@@ -1,6 +1,7 @@
 <?php
 
     require_once '../database/database.php';
+    include '../rbac/class.rbac.php';
     include 'class.user.php';
 
     $userName  = $_POST['userName'];
@@ -11,11 +12,13 @@
 
     try{
         $user = new User();
-        $user->checkAddFields($userName, $password, $firstName, $lastName, $role);
+        $rbac = new Rbac();
+        $user->checkAddFields($userName, $password, $firstName, $lastName);
         $user->checkUserName($userName);        
+        $rbac->checkRole($role);        
         $user->addUser($userName, $password);
         $user->addUserProfile($firstName, $lastName);
-        $user->addUSerRole($role);
+        $rbac->addUSerRole($role);
         $response = array('Result' => "<strong>Success:</strong> Successfully Added User!", 'Status' => "alert alert-success");
         echo json_encode($response);        
     }catch (Exception $e){

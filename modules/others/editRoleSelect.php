@@ -15,7 +15,15 @@
 
     foreach($rbac->getAllRoles() as $data){
 
-        echo '<option value="'.$data['role_level'].'">'.$data['role_name'].'</option>';
+        if($rbac->getUserRole($uid) == $data['role_level']){
+
+            echo '<option value="'.$data['role_level'].'" selected>'.$data['role_name'].'</option>';
+
+        }else{
+
+            echo '<option value="'.$data['role_level'].'">'.$data['role_name'].'</option>';
+
+        }
 
     }
 
